@@ -34,3 +34,29 @@ def test_ranking_chart_orders_by_value(weather_df):
     assert list(fig.data[0].y) == ["鹿児島", "福岡"]
     fig2 = ranking_chart(s, "total_precipitation", "総降水量", "mm", ascending=False)
     assert list(fig2.data[0].y) == ["鹿児島", "福岡"]
+
+
+from pathlib import Path
+
+from typhoon_app.analysis.timeseries import values_at
+from typhoon_app.charts.map import station_map
+from typhoon_app.data.station import load_stations
+
+
+def test_station_map_with_values_track_and_position(weather_df, landfall_df, track_df):
+    stations = load_stations(Path("/nonexistent/station.csv"))
+    values = values_at(weather_df, "pressure", pd.Timestamp("2025-08-21 23:00"))
+    fig = station_map(stations, values, VARIABLES["pressure"], landfall_df, track_df, (31.8, 130.5), title="t")
+    names = [tr.name for tr in fig.data]
+    assert "台風経路" in names and "上陸/接近地点" in names and "台風中心" in names
+    assert "観測地点" in names and "観測地点（欠測）" in names   # 福岡・鹿児島以外は値が無い
+    assert fig.layout.map.style == "open-street-map"
+    assert fig.layout.map.zoom == 5
+
+
+def test_station_map_without_values_or_track(landfall_df):
+    stations = load_stations(Path("/nonexistent/station.csv"))
+    fig = station_map(stations, None, None, landfall_df)
+    names = [tr.name for tr in fig.data]
+    assert "台風経路" not in names and "台風中心" not in names
+    assert "上陸/接近地点" in names and "観測地点" in names
