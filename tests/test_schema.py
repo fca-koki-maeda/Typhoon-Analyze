@@ -55,3 +55,11 @@ def test_validate_weather_coerces_string_to_float64(weather_raw):
     df = validate_weather(string_weather)
     assert df["pressure"].dtype == "float64"
     assert df["temperature"].dtype == "float64"
+
+
+def test_validate_weather_normalizes_tz_aware_to_naive_jst(weather_raw):
+    aware = weather_raw.copy()
+    aware["datetime"] = aware["datetime"].astype(str) + "+09:00"
+    df = validate_weather(aware)
+    assert df["datetime"].dt.tz is None
+    assert df["datetime"].iloc[0] == pd.Timestamp("2025-08-21 21:00:00")

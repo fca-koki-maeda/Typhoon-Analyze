@@ -45,6 +45,9 @@ def _coerce(df: pd.DataFrame, spec: dict[str, str], name: str) -> pd.DataFrame:
             continue
         if kind == "datetime":
             coerced = pd.to_datetime(src, errors="coerce")
+            if getattr(coerced.dt, "tz", None) is not None:
+                # 契約は JST の tz なし。tz 付きで来たら JST に変換してから tz を外す
+                coerced = coerced.dt.tz_convert("Asia/Tokyo").dt.tz_localize(None)
         else:
             coerced = pd.to_numeric(src, errors="coerce")
             if kind == "int":
