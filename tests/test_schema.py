@@ -47,3 +47,11 @@ def test_validate_typhoon(fixtures_dir):
     assert df["typhoon_id"].tolist() == ["202512", "202515", "202515"]
     with pytest.raises(SchemaError, match="lat"):
         validate_typhoon(raw.drop(columns=["lat"]))
+
+
+def test_validate_weather_coerces_string_to_float64(weather_raw):
+    # Test that numeric columns from "string" dtype are coerced to plain float64
+    string_weather = weather_raw.astype({"pressure": "string", "temperature": "string"})
+    df = validate_weather(string_weather)
+    assert df["pressure"].dtype == "float64"
+    assert df["temperature"].dtype == "float64"

@@ -52,6 +52,8 @@ def _coerce(df: pd.DataFrame, spec: dict[str, str], name: str) -> pd.DataFrame:
                     coerced = coerced.astype("Int64")
                 except (TypeError, ValueError):
                     problems.append(f"{col}: 整数でない値があります")
+            else:
+                coerced = coerced.astype("float64")
         # 元は値があるのに変換後 NaN になったセル = 解釈できない値
         nonblank = src.notna() & (src.astype("string").str.strip() != "")
         bad = coerced.isna() & nonblank.fillna(False)
