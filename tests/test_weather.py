@@ -81,3 +81,21 @@ def test_get_fetcher_missing_module_is_none():
 
 def test_get_fetcher_returns_callable():
     assert callable(get_fetcher("math", "sqrt"))
+
+
+def test_corrupt_cache_is_reported_not_raised(tmp_path):
+    path = cache_path("202512", "福岡", tmp_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("")
+    r = get_station_weather("202512", "福岡", WINDOW, None, tmp_path)
+    assert r.status == "error"
+    assert "EmptyDataError" in r.message
+
+
+def test_save_failure_still_returns_fetched_data(tmp_path, weather_df):
+    cache_dir = tmp_path / "cache"
+    cache_dir.write_text("not a directory")
+    r = get_station_weather("202512", "福岡", WINDOW, make_fetcher(weather_df, []), cache_dir)
+    assert r.status == "fetched"
+    assert len(r.df) == 6
+    assert "保存に失敗" in r.message

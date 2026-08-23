@@ -57,8 +57,8 @@ def get_station_weather(
     path = cache_path(typhoon_id, station, cache_dir)
     try:
         cached = read_cache(path)
-    except SchemaError as e:
-        return StationResult(station, "error", message=f"キャッシュの形式が不正です: {e}")
+    except Exception as e:  # noqa: BLE001 — 壊れたキャッシュも地点単位で報告して続行する（設計書 §7）
+        return StationResult(station, "error", message=f"キャッシュを読めません: {type(e).__name__}: {e}")
     if cached is not None:
         return StationResult(station, "cached", cached)
 
@@ -70,7 +70,10 @@ def get_station_weather(
         df = validate_weather(fetcher(station, start, end))
     except Exception as e:  # noqa: BLE001 — 取得失敗は種類を問わず地点単位で報告して続行する（設計書 §7）
         return StationResult(station, "error", message=f"{type(e).__name__}: {e}")
-    write_cache(df, path)
+    try:
+        write_cache(df, path)
+    except OSError as e:
+        return StationResult(station, "fetched", df, message=f"取得はできましたがキャッシュ保存に失敗しました: {e}")
     return StationResult(station, "fetched", df)
 
 
