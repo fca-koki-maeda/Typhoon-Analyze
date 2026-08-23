@@ -6,6 +6,7 @@ import streamlit as st
 from typhoon_app.config import DEFAULT_VARIABLES, DEFAULT_WINDOW_DAYS, MAX_WINDOW_DAYS, VARIABLES
 from typhoon_app.data.typhoon import TyphoonEvent
 from typhoon_app.data.weather import StationResult
+from typhoon_app.ui.loaders import load_station_weather_cached
 from typhoon_app.ui.state import Selection
 
 _STATUS_LABEL = {
@@ -49,6 +50,7 @@ def render_data_status(results: dict[str, StationResult], fetcher_available: boo
         col1, col2 = st.columns(2)
         if any(r.status == "error" for r in results.values()):
             if col1.button("再試行"):
+                load_station_weather_cached.clear()
                 st.rerun()
         if col2.button("データを再読込"):
             st.cache_data.clear()

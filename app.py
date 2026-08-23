@@ -10,10 +10,15 @@ from typhoon_app.data.schema import SchemaError
 from typhoon_app.data.source import get_fetcher
 from typhoon_app.data.station import nearest_station
 from typhoon_app.data.typhoon import get_event, list_typhoons
-from typhoon_app.data.weather import StationResult, cache_path, combine, get_station_weather
+from typhoon_app.data.weather import StationResult, cache_path, combine
 from typhoon_app.ui.glossary import render_glossary
 from typhoon_app.ui.header import render_header
-from typhoon_app.ui.loaders import load_landfall_cached, load_stations_cached, load_track_cached
+from typhoon_app.ui.loaders import (
+    load_landfall_cached,
+    load_station_weather_cached,
+    load_stations_cached,
+    load_track_cached,
+)
 from typhoon_app.ui.sidebar import render_data_status, render_sidebar
 from typhoon_app.ui.tab_map import render_map
 from typhoon_app.ui.tab_overview import render_overview
@@ -44,11 +49,11 @@ def main() -> None:
     fetcher = get_fetcher()
     results: dict[str, StationResult] = {}
     for name in selection.stations:
-        if cache_path(event.typhoon_id, name).exists():
-            results[name] = get_station_weather(event.typhoon_id, name, event.fetch_window(), fetcher)
+        if cache_path(event.typhoon_id, name).exists() or fetcher is None:
+            results[name] = load_station_weather_cached(event.typhoon_id, name, event.fetch_window(), fetcher)
         else:
             with st.spinner(f"{name}: 気象庁から取得中…"):
-                results[name] = get_station_weather(event.typhoon_id, name, event.fetch_window(), fetcher)
+                results[name] = load_station_weather_cached(event.typhoon_id, name, event.fetch_window(), fetcher)
     render_data_status(results, fetcher is not None)
     render_glossary()
 
