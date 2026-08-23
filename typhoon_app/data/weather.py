@@ -11,7 +11,7 @@ from typing import Literal
 import pandas as pd
 
 from typhoon_app.config import WEATHER_CACHE_DIR
-from typhoon_app.data.schema import WEATHER_COLUMNS, SchemaError, validate_weather
+from typhoon_app.data.schema import WEATHER_COLUMNS, validate_weather
 from typhoon_app.data.source import WeatherFetcher
 
 Status = Literal["cached", "fetched", "unavailable", "error"]
