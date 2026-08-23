@@ -24,7 +24,10 @@ def load_stations(path: Path = STATION_CSV) -> dict[str, Station]:
         raise SchemaError(f"station.csv: 欠けているカラム: {missing}")
     for row in df.itertuples(index=False):
         name = str(row.station)
-        stations[name] = Station(name, float(row.lat), float(row.lon), int(row.prec_no), int(row.block_no))
+        try:
+            stations[name] = Station(name, float(row.lat), float(row.lon), int(row.prec_no), int(row.block_no))
+        except (TypeError, ValueError) as e:
+            raise SchemaError(f"station.csv: {name} の値を解釈できません: {e}") from e
     return stations
 
 

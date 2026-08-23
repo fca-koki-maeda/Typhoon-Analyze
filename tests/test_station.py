@@ -27,6 +27,13 @@ def test_load_stations_rejects_bad_columns(tmp_path):
         load_stations(p)
 
 
+def test_load_stations_rejects_non_numeric_cells(tmp_path):
+    p = tmp_path / "station.csv"
+    p.write_text("station,lat,lon,prec_no,block_no\n福岡,abc,130.4,82,47807\n", encoding="utf-8")
+    with pytest.raises(SchemaError, match="station.csv"):
+        load_stations(p)
+
+
 def test_haversine_fukuoka_kagoshima():
     d = haversine_km(33.582, 130.375, 31.555, 130.547)
     assert 200 < d < 250
