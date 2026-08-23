@@ -38,3 +38,4 @@ uv run pytest                   # テスト
 
 GitHub リポジトリを連携し、メインファイルに `app.py` を指定します。`requirements.txt` は
 `uv export --format requirements-txt --no-dev --no-hashes -o requirements.txt` で生成したものをコミットしてください。
+Advanced settings で Python 3.12 を選んでください（pandas 3 系は Python 3.11 以上が必要。.python-version は Cloud では読まれません）。
