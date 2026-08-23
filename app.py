@@ -57,6 +57,12 @@ def main() -> None:
     render_data_status(results, fetcher is not None)
     render_glossary()
 
+    if selection.stations and not any(r.ok for r in results.values()):
+        if fetcher is None:
+            st.warning("この台風のデータは未取得です（キャッシュ専用モード）。data/processed/weather/ にキャッシュを置くか、取得関数を用意してください。")
+        else:
+            st.warning("この台風のデータを取得できませんでした。サイドバーの「データ状態」を確認してください。")
+
     # ヘッダ
     nearest = nearest_station(event.landfall_lat, event.landfall_lon, stations)
     render_header(event, nearest.name)
