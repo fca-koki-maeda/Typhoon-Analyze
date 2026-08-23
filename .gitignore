@@ -1,2 +1,9 @@
 # ローカル専用（Claude Code 向けコンテキスト）
 CLAUDE.md
+
+# Python / uv
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.streamlit/secrets.toml
