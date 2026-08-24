@@ -23,7 +23,7 @@ uv run pytest                   # テスト
 
 - `data/processed/` を生データから生成する: `uv run python scripts/dev_sample_data.py`（台風データはこれが正式ルート。気象キャッシュは `fetch_weather` 完成までの暫定）
 - 発表前にキャッシュを一括生成する: `uv run python scripts/build_cache.py 202508 202512 202515`
-  （データ側の `preprocess/weather_source.py` の `fetch_weather(station, start, end)` が必要）
+  （`preprocess/weather_source.py` の `fetch_weather` を使用。実装済み）
 
 ## ディレクトリ
 

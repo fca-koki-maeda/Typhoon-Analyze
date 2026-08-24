@@ -239,10 +239,10 @@ sidebar → Selection
 
 ## 10. データ担当への依頼事項（まとめ）
 
-1. `fetch_weather(station, start, end)` を §4-1/§4-2 の仕様（6 列）で実装（モジュール名・場所を教えてもらう）。
+1. `fetch_weather(station, start, end)` を §4-1/§4-2 の仕様（6 列）で実装（モジュール名・場所を教えてもらう）。→ 実装済み（2026-08-24, `preprocess/weather_source.py`。既存 jma_scraper を関数化）。
 2. 台風データは現行 `data/typhoon/typhoon_track.csv` の変換（`scripts/dev_sample_data.py`）で正式に賄う（対応済み）。より細かい時別データが手に入れば、同じ 6 列で `track.csv` を差し替えるだけでよい。
 3. 可能なら `data/processed/station.csv`（緯度経度）を用意。
-4. データ側依存（beautifulsoup4, openpyxl 等）を `pyproject.toml` に追加。
+4. データ側依存（beautifulsoup4, openpyxl 等）を `pyproject.toml` に追加。→ 対応済み（requests, beautifulsoup4）。
 
 ## 11. 未決事項・拡張候補
 
