@@ -26,13 +26,6 @@ def weather_df(weather_raw) -> pd.DataFrame:
 
 
 @pytest.fixture
-def landfall_df() -> pd.DataFrame:
-    from typhoon_app.data.typhoon import load_landfall
-
-    return load_landfall(FIXTURES / "landfall_small.csv")
-
-
-@pytest.fixture
 def track_df() -> pd.DataFrame:
     from typhoon_app.data.typhoon import load_track
 

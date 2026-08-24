@@ -15,7 +15,6 @@ def test_validate_weather_coerces_types(weather_raw):
     assert list(WEATHER_COLUMNS) == [c for c in df.columns if c in WEATHER_COLUMNS]
     assert str(df["datetime"].dtype).startswith("datetime64")
     assert df["pressure"].dtype == "float64"
-    assert str(df["weather_code"].dtype) == "Int64"
     assert df["precipitation"].isna().sum() == 1          # 鹿児島 02:00 の欠測
     assert df["datetime"].iloc[0] == pd.Timestamp("2025-08-21 21:00:00")
 
@@ -40,11 +39,11 @@ def test_validate_weather_sorts_by_station_and_time(weather_raw):
 
 
 def test_validate_typhoon(fixtures_dir):
-    raw = pd.read_csv(fixtures_dir / "landfall_small.csv", dtype={"typhoon_id": str})
+    raw = pd.read_csv(fixtures_dir / "track_small.csv", dtype={"typhoon_id": str})
     df = validate_typhoon(raw)
     assert list(TYPHOON_COLUMNS) == [c for c in df.columns if c in TYPHOON_COLUMNS]
-    assert df["storm_diameter_nm"].isna().all()
-    assert df["typhoon_id"].tolist() == ["202512", "202515", "202515"]
+    assert df["max_wind_kt"].dtype == "float64"
+    assert df["typhoon_id"].tolist() == ["202512"] * 4 + ["202515"] * 3
     with pytest.raises(SchemaError, match="lat"):
         validate_typhoon(raw.drop(columns=["lat"]))
 

@@ -14,9 +14,7 @@ WEATHER_COLUMNS: dict[str, str] = {
     "temperature": "float",
     "precipitation": "float",
     "wind_speed": "float",
-    "wind_direction": "string",
     "pressure": "float",
-    "weather_code": "int",
 }
 
 TYPHOON_COLUMNS: dict[str, str] = {
@@ -26,8 +24,6 @@ TYPHOON_COLUMNS: dict[str, str] = {
     "lon": "float",
     "pressure": "float",
     "max_wind_kt": "float",
-    "storm_diameter_nm": "float",
-    "gale_diameter_nm": "float",
 }
 
 
@@ -50,13 +46,7 @@ def _coerce(df: pd.DataFrame, spec: dict[str, str], name: str) -> pd.DataFrame:
                 coerced = coerced.dt.tz_convert("Asia/Tokyo").dt.tz_localize(None)
         else:
             coerced = pd.to_numeric(src, errors="coerce")
-            if kind == "int":
-                try:
-                    coerced = coerced.astype("Int64")
-                except (TypeError, ValueError):
-                    problems.append(f"{col}: 整数でない値があります")
-            else:
-                coerced = coerced.astype("float64")
+            coerced = coerced.astype("float64")
         # 元は値があるのに変換後 NaN になったセル = 解釈できない値
         nonblank = src.notna() & (src.astype("string").str.strip() != "")
         bad = coerced.isna() & nonblank.fillna(False)
