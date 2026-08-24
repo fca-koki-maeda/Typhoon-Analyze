@@ -18,12 +18,13 @@ uv run pytest                   # テスト
 | パス | 内容 | 必須 |
 |---|---|---|
 | `data/processed/typhoon/track.csv` | 台風の経路（`data/typhoon/typhoon_track.csv` から変換） | 必須 |
-| `data/processed/station.csv` | 地点の緯度経度（無ければ内蔵値） | 任意 |
+| `data/processed/station.csv` | 全国の気象官署一覧（`scripts/build_station_master.py` で生成・同梱済み） | 任意（無ければ内蔵 8 地点） |
 | `data/processed/weather/{台風番号}_{地点}.csv` | 気象データのキャッシュ | 無ければオンデマンド取得 |
 
 - `data/processed/` を生データから生成する: `uv run python scripts/dev_sample_data.py`（台風データはこれが正式ルート。気象キャッシュは `fetch_weather` 完成までの暫定）
 - 発表前にキャッシュを一括生成する: `uv run python scripts/build_cache.py 202508 202512 202515`
   （`preprocess/weather_source.py` の `fetch_weather` を使用。実装済み）
+- 地点マスタの再生成: `uv run python scripts/build_station_master.py`
 
 ## ディレクトリ
 
