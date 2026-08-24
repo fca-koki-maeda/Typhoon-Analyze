@@ -83,6 +83,11 @@ def test_get_fetcher_returns_callable():
     assert callable(get_fetcher("math", "sqrt"))
 
 
+def test_get_fetcher_finds_real_implementation():
+    from preprocess.weather_source import fetch_weather as real
+    assert get_fetcher() is real
+
+
 def test_corrupt_cache_is_reported_not_raised(tmp_path):
     path = cache_path("202512", "福岡", tmp_path)
     path.parent.mkdir(parents=True, exist_ok=True)
