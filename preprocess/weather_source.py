@@ -13,15 +13,13 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from typhoon_app.config import DEFAULT_STATIONS
+from typhoon_app.data.station import load_stations
 
-BASE_URL = "https://www.data.jma.go.jp/obd/stats/etrn/view/hourly_s1.php"
+BASE_URL = "https://www.data.jma.go.jp/stats/etrn/view/hourly_s1.php"
 REQUEST_INTERVAL_SECONDS = 1.0  # 連続アクセスの間隔（マナー）
 TIMEOUT_SECONDS = 30
 
 WEATHER_COLUMNS = ["station", "datetime", "temperature", "precipitation", "wind_speed", "pressure"]
-
-_STATION_NUMBERS = {s.name: (s.prec_no, s.block_no) for s in DEFAULT_STATIONS}
 
 
 class WeatherFetchError(Exception):
@@ -68,9 +66,10 @@ def _parse_day(html: bytes, day: date, station: str) -> list[dict]:
 def fetch_weather(station: str, start: date, end: date) -> pd.DataFrame:
     """指定地点・期間（両端の日を含む）の時別値を取得し、データ契約（6 列）の DataFrame を返す。
     失敗したら WeatherFetchError を送出する。リクエスト間に REQUEST_INTERVAL_SECONDS 待つ。"""
-    if station not in _STATION_NUMBERS:
-        raise WeatherFetchError(f"未対応の観測地点です: {station}（対応: {', '.join(_STATION_NUMBERS)}）")
-    prec_no, block_no = _STATION_NUMBERS[station]
+    stations = load_stations()
+    if station not in stations:
+        raise WeatherFetchError(f"未対応の観測地点です: {station}")
+    prec_no, block_no = stations[station].prec_no, stations[station].block_no
     records: list[dict] = []
     day = start
     while day <= end:

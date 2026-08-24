@@ -75,3 +75,32 @@ def test_fetch_weather_live_one_day():
     df = fetch_weather("福岡", date(2025, 7, 27), date(2025, 7, 27))
     assert len(df) == 24
     assert df["pressure"].iloc[0] == 1004.4
+
+
+def test_fetch_weather_uses_station_master(monkeypatch):
+    """station.csv で追加された地点でも取得できる（地点解決は load_stations 経由）。"""
+    from typhoon_app.config import Station
+
+    html = FIXTURE.read_bytes()
+
+    class FakeResponse:
+        content = html
+        def raise_for_status(self):
+            pass
+
+    calls = []
+    def fake_get(url, params=None, timeout=None):
+        calls.append(params)
+        return FakeResponse()
+
+    monkeypatch.setattr("preprocess.weather_source.requests.get", fake_get)
+    monkeypatch.setattr(
+        "preprocess.weather_source.load_stations",
+        lambda: {"東京": Station("東京", 35.69, 139.75, 44, 47662)},
+    )
+    df = fetch_weather("東京", date(2025, 7, 27), date(2025, 7, 27))
+    assert calls[0]["prec_no"] == 44 and calls[0]["block_no"] == 47662
+    assert set(df["station"]) == {"東京"}
+
+    with pytest.raises(WeatherFetchError, match="未対応"):
+        fetch_weather("福岡", date(2025, 7, 27), date(2025, 7, 27))  # マスタに無い地点はエラー
