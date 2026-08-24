@@ -30,21 +30,18 @@ def test_values_at_unknown_time_is_empty(weather_df):
 
 
 def test_position_at_interpolates_between_points(track_df):
-    assert position_at(track_df, pd.Timestamp("2025-08-21 18:00")) == pytest.approx((31.8, 130.5))
-    assert position_at(track_df, pd.Timestamp("2025-08-21 09:00")) == pytest.approx((30.0, 129.5))
+    trk = track_df[track_df["typhoon_id"] == "202512"]
+    assert position_at(trk, pd.Timestamp("2025-08-21 18:00")) == pytest.approx((31.8, 130.5))
+    assert position_at(trk, pd.Timestamp("2025-08-21 09:00")) == pytest.approx((30.0, 129.5))
 
 
 def test_position_at_outside_range_is_none(track_df):
-    assert position_at(track_df, pd.Timestamp("2025-08-23 00:00")) is None
+    trk = track_df[track_df["typhoon_id"] == "202512"]
+    assert position_at(trk, pd.Timestamp("2025-08-23 00:00")) is None
     assert position_at(None, pd.Timestamp("2025-08-21 18:00")) is None
 
 
-def test_typhoon_position_prefers_track(landfall_df, track_df):
-    e = get_event("202512", landfall_df, track_df)
+def test_typhoon_position_interpolates(track_df):
+    e = get_event("202512", track_df)
     assert typhoon_position(e, pd.Timestamp("2025-08-21 18:00")) == pytest.approx((31.8, 130.5))
-
-
-def test_typhoon_position_falls_back_to_landfall_within_6h(landfall_df):
-    e = get_event("202512", landfall_df)   # track なし
-    assert typhoon_position(e, pd.Timestamp("2025-08-21 18:00")) == pytest.approx((31.6, 130.3))
     assert typhoon_position(e, pd.Timestamp("2025-08-23 00:00")) is None

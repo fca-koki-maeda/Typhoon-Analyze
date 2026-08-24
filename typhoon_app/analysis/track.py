@@ -6,8 +6,6 @@ import pandas as pd
 
 from typhoon_app.data.typhoon import TyphoonEvent
 
-_FALLBACK_TOLERANCE = pd.Timedelta(hours=6)
-
 
 def position_at(track: pd.DataFrame | None, t) -> tuple[float, float] | None:
     """経路点を時間で線形補間した位置。経路が無い／範囲外なら None。"""
@@ -28,14 +26,5 @@ def position_at(track: pd.DataFrame | None, t) -> tuple[float, float] | None:
 
 
 def typhoon_position(event: TyphoonEvent, t) -> tuple[float, float] | None:
-    """経路があれば補間位置。無ければ 6 時間以内に上陸/接近点があればその位置。どちらも無ければ None。"""
-    pos = position_at(event.track, t)
-    if pos is not None:
-        return pos
-    t = pd.Timestamp(t)
-    lf = event.landfalls
-    deltas = (lf["datetime"] - t).abs()
-    i = deltas.idxmin()
-    if deltas.loc[i] > _FALLBACK_TOLERANCE:
-        return None
-    return float(lf.loc[i, "lat"]), float(lf.loc[i, "lon"])
+    """経路点を時間で線形補間した位置。範囲外なら None。"""
+    return position_at(event.track, t)

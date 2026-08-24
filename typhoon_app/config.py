@@ -8,12 +8,10 @@ from typing import Literal
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
 WEATHER_CACHE_DIR = PROCESSED_DIR / "weather"
-LANDFALL_CSV = PROCESSED_DIR / "typhoon" / "landfall.csv"
 TRACK_CSV = PROCESSED_DIR / "typhoon" / "track.csv"
 STATION_CSV = PROCESSED_DIR / "station.csv"
 
-MAX_WINDOW_DAYS = 7       # 取得窓: 接近基準時刻の前後 7 日（固定）
-DEFAULT_WINDOW_DAYS = 3   # 表示窓の既定
+WINDOW_DAYS = 1   # 取得・表示窓 = 台風データ期間の前後1日、固定
 
 # データ側が実装する取得関数の場所（設計書 §4-1）
 FETCHER_MODULE = "preprocess.weather_source"
@@ -59,15 +57,6 @@ VARIABLES: dict[str, Variable] = {
     "temperature": Variable("temperature", "気温", "℃", "line", "max"),
 }
 DEFAULT_VARIABLES: tuple[str, ...] = ("pressure", "wind_speed", "precipitation")
-
-# 気象庁 時別値の天気コード → 名称（表示用）
-WEATHER_CODE_NAMES: dict[int, str] = {
-    1: "快晴", 2: "晴", 3: "薄曇", 4: "曇", 5: "煙霧", 6: "砂じん嵐", 7: "地ふぶき",
-    8: "霧", 9: "霧雨", 10: "雨", 11: "みぞれ", 12: "雪", 13: "あられ", 14: "ひょう",
-    15: "雷", 16: "しゅう雨または止み間のある雨", 17: "着氷性の雨", 18: "着氷性の霧雨",
-    19: "しゅう雪または止み間のある雪", 22: "霧雪", 23: "凍雨", 24: "細氷", 28: "もや",
-    101: "降水またはしゅう雨性の降水",
-}
 
 MAP_CENTER: tuple[float, float] = (31.0, 130.5)
 MAP_ZOOM: int = 5

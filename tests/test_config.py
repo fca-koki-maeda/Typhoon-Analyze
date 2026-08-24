@@ -13,6 +13,4 @@ def test_variables_and_windows():
     assert set(config.VARIABLES) == {"pressure", "wind_speed", "precipitation", "temperature"}
     assert config.VARIABLES["precipitation"].kind == "bar"
     assert config.VARIABLES["pressure"].agg == "min"
-    assert config.MAX_WINDOW_DAYS == 7
-    assert 1 <= config.DEFAULT_WINDOW_DAYS <= config.MAX_WINDOW_DAYS
-    assert config.WEATHER_CODE_NAMES[2] == "晴"
+    assert config.WINDOW_DAYS == 1
