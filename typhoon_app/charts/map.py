@@ -18,7 +18,6 @@ def station_map(
     stations: dict[str, Station],
     values: pd.DataFrame | None,
     var: Variable | None,
-    landfalls: pd.DataFrame,
     track: pd.DataFrame | None = None,
     typhoon_pos: tuple[float, float] | None = None,
     title: str = "",
@@ -33,15 +32,7 @@ def station_map(
             hovertext=[_fmt_time(t) for t in track["datetime"]], hoverinfo="text",
         ))
 
-    # 2) 上陸/接近地点
-    if landfalls is not None and not landfalls.empty:
-        fig.add_trace(go.Scattermap(
-            lat=landfalls["lat"], lon=landfalls["lon"], mode="markers", name="上陸/接近地点",
-            marker=dict(size=12, color="red"),
-            hovertext=[f"上陸/接近 {_fmt_time(t)}" for t in landfalls["datetime"]], hoverinfo="text",
-        ))
-
-    # 3) 観測地点（値があれば色分け、無ければ灰色）
+    # 2) 観測地点（値があれば色分け、無ければ灰色）
     names = list(stations)
     value_map: dict[str, float] = {}
     if values is not None and var is not None and not values.empty:
@@ -69,7 +60,7 @@ def station_map(
             hovertext=[f"{n}: データなし" for n in grey], hoverinfo="text",
         ))
 
-    # 4) 台風中心（この時刻の位置）
+    # 3) 台風中心（この時刻の位置）
     if typhoon_pos is not None and not any(math.isnan(v) for v in typhoon_pos):
         fig.add_trace(go.Scattermap(
             lat=[typhoon_pos[0]], lon=[typhoon_pos[1]], mode="markers", name="台風中心",
