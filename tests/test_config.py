@@ -7,6 +7,8 @@ def test_default_stations_are_eight_kyushu_okinawa_points():
     assert config.STATION_NAMES == names
     for s in config.DEFAULT_STATIONS:
         assert 24 < s.lat < 35 and 126 < s.lon < 133
+    by_name = {s.name: s for s in config.DEFAULT_STATIONS}
+    assert by_name["大分"].block_no == 47815   # 旧値 47624 は前橋（回帰防止）
 
 
 def test_variables_and_windows():
