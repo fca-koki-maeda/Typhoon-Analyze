@@ -17,8 +17,7 @@ uv run pytest                   # テスト
 
 | パス | 内容 | 必須 |
 |---|---|---|
-| `data/processed/typhoon/landfall.csv` | 台風の上陸/接近点 | 必須 |
-| `data/processed/typhoon/track.csv` | 台風の全経路（あれば地図に線） | 任意 |
+| `data/processed/typhoon/track.csv` | 台風の経路（1 時間ごと程度） | 必須 |
 | `data/processed/station.csv` | 地点の緯度経度（無ければ内蔵値） | 任意 |
 | `data/processed/weather/{台風番号}_{地点}.csv` | 気象データのキャッシュ | 無ければオンデマンド取得 |
 
