@@ -1,4 +1,4 @@
-"""対象台風 × 全地点のキャッシュ CSV を事前生成する（設計書 §4-3 / §9）。
+"""対象台風 × 内蔵 8 地点（config.STATION_NAMES）のキャッシュ CSV を事前生成する（設計書 §4-3 / §9）。
 
 使い方: uv run python scripts/build_cache.py 202508 202512 202515
 既にキャッシュがある地点はスキップ（status=cached）。データ側の fetch_weather が必要。
