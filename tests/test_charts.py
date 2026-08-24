@@ -55,7 +55,7 @@ def test_station_map_with_values_track_and_position(weather_df, track_df):
     assert "台風経路" in names and "台風中心" in names
     assert "観測地点" in names and "観測地点（欠測）" in names   # 福岡・鹿児島以外は値が無い
     assert fig.layout.map.style == "open-street-map"
-    assert fig.layout.map.zoom == 5
+    assert 3.2 <= fig.layout.map.zoom <= 9.0
 
 
 def test_station_map_without_values_or_track():
@@ -64,3 +64,14 @@ def test_station_map_without_values_or_track():
     names = [tr.name for tr in fig.data]
     assert "台風経路" not in names and "台風中心" not in names
     assert names == ["観測地点"]
+
+
+def test_station_map_autofits_to_selection():
+    stations = load_stations(Path("/nonexistent/station.csv"))
+    fig_all = station_map(stations, None, None)
+    two = {k: stations[k] for k in ["福岡", "佐賀"]}
+    fig_two = station_map(two, None, None)
+    assert fig_two.layout.map.zoom > fig_all.layout.map.zoom      # 近い2地点はズームイン
+    assert 26 < fig_all.layout.map.center.lat < 34                 # 8地点の中心は九州〜沖縄の間
+    fig_empty = station_map({}, None, None)
+    assert fig_empty.layout.map.zoom == 5                          # 地点なしは既定値

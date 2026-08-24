@@ -14,6 +14,25 @@ def _fmt_time(ts) -> str:
     return f"{ts.month}/{ts.day} {ts:%H:%M}"
 
 
+_MIN_ZOOM, _MAX_ZOOM = 3.2, 9.0
+
+
+def _fit_view(stations: dict[str, Station]) -> tuple[dict, float]:
+    """選択地点が収まる center と zoom を返す。地点が無ければ既定値。"""
+    if not stations:
+        return dict(lat=MAP_CENTER[0], lon=MAP_CENTER[1]), float(MAP_ZOOM)
+    lats = [s.lat for s in stations.values()]
+    lons = [s.lon for s in stations.values()]
+    center = dict(lat=(min(lats) + max(lats)) / 2, lon=(min(lons) + max(lons)) / 2)
+    span = max(
+        max(lats) - min(lats),
+        (max(lons) - min(lons)) * math.cos(math.radians(center["lat"])),
+        0.5,  # 1 地点でも寄りすぎない下限
+    )
+    zoom = math.log2(360.0 / span) - 1.3
+    return center, max(_MIN_ZOOM, min(_MAX_ZOOM, zoom))
+
+
 def station_map(
     stations: dict[str, Station],
     values: pd.DataFrame | None,
@@ -67,9 +86,10 @@ def station_map(
             marker=dict(size=22, color="orange", opacity=0.8), hovertext=["台風中心"], hoverinfo="text",
         ))
 
+    center, zoom = _fit_view(stations)
     fig.update_layout(
         title=title,
-        map=dict(style="open-street-map", center=dict(lat=MAP_CENTER[0], lon=MAP_CENTER[1]), zoom=MAP_ZOOM),
+        map=dict(style="open-street-map", center=center, zoom=zoom),
         margin=dict(l=0, r=0, t=40, b=0),
         height=550,
         legend=dict(orientation="h", yanchor="bottom", y=0.01, xanchor="left", x=0.01, bgcolor="rgba(255,255,255,0.7)"),

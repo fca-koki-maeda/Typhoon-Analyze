@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-from typhoon_app.config import DEFAULT_VARIABLES, VARIABLES
+from typhoon_app.config import DEFAULT_VARIABLES, STATION_NAMES, VARIABLES
 from typhoon_app.data.typhoon import TyphoonEvent
 from typhoon_app.data.weather import StationResult
 from typhoon_app.ui.loaders import load_station_weather_cached
@@ -24,7 +24,10 @@ def render_sidebar(events: list[TyphoonEvent], station_names: list[str]) -> Sele
         typhoon_id = st.selectbox(
             "台風を選択", options=[e.typhoon_id for e in events], format_func=lambda i: labels[i]
         )
-        stations = st.multiselect("地点を選択", options=station_names, default=station_names)
+        default = [n for n in STATION_NAMES if n in station_names] or station_names[:8]
+        stations = st.multiselect("地点を選択", options=station_names, default=default)
+        if len(station_names) > len(default):
+            st.caption("全国の気象官署を追加選択できます（既定は九州・沖縄 8 地点）")
         variables = st.multiselect(
             "気象要素",
             options=list(VARIABLES),
