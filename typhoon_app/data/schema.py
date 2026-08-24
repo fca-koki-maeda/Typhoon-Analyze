@@ -66,6 +66,6 @@ def validate_weather(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def validate_typhoon(df: pd.DataFrame) -> pd.DataFrame:
-    """台風データ（landfall / track 共通）を検証し、typhoon_id, datetime 昇順で返す。"""
+    """台風の経路データ（track.csv）を検証し、typhoon_id, datetime 昇順で返す。"""
     out = _coerce(df, TYPHOON_COLUMNS, "typhoon")
     return out.sort_values(["typhoon_id", "datetime"]).reset_index(drop=True)

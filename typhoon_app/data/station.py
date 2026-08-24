@@ -42,5 +42,5 @@ def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 
 def nearest_station(lat: float, lon: float, stations: dict[str, Station]) -> Station:
-    """(lat, lon) に最も近い地点を返す。ヘッダの「◯◯付近」表示に使う。"""
+    """(lat, lon) に最も近い地点を返す。現在アプリ本体からは未使用（将来の距離分析用に残している）。"""
     return min(stations.values(), key=lambda s: haversine_km(lat, lon, s.lat, s.lon))
