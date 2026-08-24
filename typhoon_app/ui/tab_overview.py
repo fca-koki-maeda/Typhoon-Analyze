@@ -11,14 +11,14 @@ from typhoon_app.charts.ranking import ranking_chart
 # 要素 → サマリ表に出す列
 _COLUMNS_BY_VARIABLE = {
     "pressure": ["min_pressure", "min_pressure_time"],
-    "wind_speed": ["max_wind_speed", "max_wind_speed_time", "max_wind_direction"],
+    "wind_speed": ["max_wind_speed", "max_wind_speed_time"],
     "precipitation": ["total_precipitation", "max_precipitation", "max_precipitation_time"],
     "temperature": ["max_temperature", "min_temperature"],
 }
 _LABELS = {
     "station": "地点",
     "min_pressure": "最低気圧 (hPa)", "min_pressure_time": "最低気圧の時刻",
-    "max_wind_speed": "最大風速 (m/s)", "max_wind_speed_time": "最大風速の時刻", "max_wind_direction": "そのときの風向",
+    "max_wind_speed": "最大風速 (m/s)", "max_wind_speed_time": "最大風速の時刻",
     "total_precipitation": "総降水量 (mm)", "max_precipitation": "最大1時間降水量 (mm)", "max_precipitation_time": "その時刻",
     "max_temperature": "最高気温 (℃)", "min_temperature": "最低気温 (℃)",
     "missing_rate": "欠測率 (%)",

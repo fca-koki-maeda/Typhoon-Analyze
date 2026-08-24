@@ -9,7 +9,7 @@ MISSING_RATE_COLUMNS = ["temperature", "precipitation", "wind_speed", "pressure"
 SUMMARY_COLUMNS = [
     "station",
     "min_pressure", "min_pressure_time",
-    "max_wind_speed", "max_wind_speed_time", "max_wind_direction",
+    "max_wind_speed", "max_wind_speed_time",
     "total_precipitation", "max_precipitation", "max_precipitation_time",
     "max_temperature", "min_temperature",
     "missing_rate",
@@ -17,29 +17,26 @@ SUMMARY_COLUMNS = [
 
 
 def _extreme(g: pd.DataFrame, col: str, kind: str):
-    """(値, 発生時刻, 行ラベル)。全欠測なら (nan, NaT, None)。"""
+    """(値, 発生時刻)。全欠測なら (nan, NaT)。"""
     s = g[col].dropna()
     if s.empty:
-        return np.nan, pd.NaT, None
+        return np.nan, pd.NaT
     label = s.idxmax() if kind == "max" else s.idxmin()
-    return float(s.loc[label]), g.loc[label, "datetime"], label
+    return float(s.loc[label]), g.loc[label, "datetime"]
 
 
 def _summarize_station(g: pd.DataFrame) -> dict:
-    p, p_t, _ = _extreme(g, "pressure", "min")
-    w, w_t, w_i = _extreme(g, "wind_speed", "max")
-    w_dir = g.loc[w_i, "wind_direction"] if w_i is not None else None
-    if w_dir is not None and pd.isna(w_dir):
-        w_dir = None
-    r, r_t, _ = _extreme(g, "precipitation", "max")
-    t_max, _, _ = _extreme(g, "temperature", "max")
-    t_min, _, _ = _extreme(g, "temperature", "min")
+    p, p_t = _extreme(g, "pressure", "min")
+    w, w_t = _extreme(g, "wind_speed", "max")
+    r, r_t = _extreme(g, "precipitation", "max")
+    t_max, _ = _extreme(g, "temperature", "max")
+    t_min, _ = _extreme(g, "temperature", "min")
     total = float(g["precipitation"].sum()) if g["precipitation"].notna().any() else np.nan
     cells = g[MISSING_RATE_COLUMNS]
     missing_rate = float(cells.isna().to_numpy().mean() * 100) if cells.size else np.nan
     return {
         "min_pressure": p, "min_pressure_time": p_t,
-        "max_wind_speed": w, "max_wind_speed_time": w_t, "max_wind_direction": w_dir,
+        "max_wind_speed": w, "max_wind_speed_time": w_t,
         "total_precipitation": total, "max_precipitation": r, "max_precipitation_time": r_t,
         "max_temperature": t_max, "min_temperature": t_min,
         "missing_rate": missing_rate,

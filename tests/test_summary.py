@@ -13,7 +13,6 @@ def test_summarize_fukuoka(weather_df):
     assert f["min_pressure_time"] == pd.Timestamp("2025-08-21 23:00")
     assert f["max_wind_speed"] == 6.0
     assert f["max_wind_speed_time"] == pd.Timestamp("2025-08-21 23:00")
-    assert f["max_wind_direction"] == "南東"
     assert f["total_precipitation"] == pytest.approx(3.5)
     assert f["max_precipitation"] == 2.0
     assert f["max_precipitation_time"] == pd.Timestamp("2025-08-21 23:00")
@@ -27,7 +26,6 @@ def test_summarize_kagoshima_with_missing(weather_df):
     assert k["min_pressure"] == 980.0
     assert k["max_wind_speed"] == 20.0
     assert k["max_wind_speed_time"] == pd.Timestamp("2025-08-22 00:00")
-    assert k["max_wind_direction"] == "南東"
     assert k["total_precipitation"] == pytest.approx(44.5)
     assert k["max_precipitation"] == 20.5
     assert k["missing_rate"] == pytest.approx(200 / 24)   # 降水 1 + 風速 1
@@ -49,4 +47,3 @@ def test_summarize_all_missing_variable(weather_df):
     s = summarize(df).set_index("station")
     assert pd.isna(s.loc["福岡", "min_pressure"])
     assert pd.isna(s.loc["福岡", "min_pressure_time"])
-    assert s.loc["福岡", "max_wind_direction"] is None
