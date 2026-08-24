@@ -9,6 +9,12 @@ APP_PATH = str(PROJECT_ROOT / "app.py")   # AppTest.from_file はテストファ
 pytestmark = pytest.mark.skipif(not TRACK_CSV.exists(), reason="data/processed/typhoon/track.csv が未整備")
 
 
+@pytest.fixture(autouse=True)
+def _offline_fetcher(monkeypatch):
+    """スモークテストは常にキャッシュ専用モードで動かす（実サイトへのアクセスを遮断）。"""
+    monkeypatch.setattr("typhoon_app.data.source.get_fetcher", lambda: None)
+
+
 def test_app_renders_without_exception():
     at = AppTest.from_file(APP_PATH, default_timeout=120)
     at.run()
@@ -24,8 +30,7 @@ def test_app_switching_typhoon():
     assert not at.exception, at.exception
 
 
-def test_app_no_cache_typhoon_shows_warning_not_exception(monkeypatch):
-    monkeypatch.setattr("typhoon_app.data.source.get_fetcher", lambda: None)  # テストでは取得しない
+def test_app_no_cache_typhoon_shows_warning_not_exception():
     at = AppTest.from_file(APP_PATH, default_timeout=120)
     at.run()
     at.selectbox[0].select("202505").run()   # 2025年 第5号: キャッシュ無し
