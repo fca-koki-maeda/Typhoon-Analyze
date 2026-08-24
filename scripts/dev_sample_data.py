@@ -1,6 +1,9 @@
-"""【暫定】開発用サンプルデータを data/processed/ に生成する。
+"""data/processed/ を生データから生成する。
 
-データ担当の成果物（同じスキーマ）が揃ったら不要になる。
+- 台風データ: data/typhoon/typhoon_track.csv（台風位置表・実体は xlsx）→ track.csv への変換。
+  こちらは正式ルート（2026-08-24 チーム合意）。
+- 気象データ: data/weather/weather_2025.csv からのキャッシュ生成。こちらはデータ担当の
+  fetch_weather が完成するまでの暫定で、完成後は scripts/build_cache.py で作り直す。
 使い方: uv run python scripts/dev_sample_data.py
 """
 from __future__ import annotations

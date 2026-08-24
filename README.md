@@ -17,11 +17,11 @@ uv run pytest                   # テスト
 
 | パス | 内容 | 必須 |
 |---|---|---|
-| `data/processed/typhoon/track.csv` | 台風の経路（1 時間ごと程度） | 必須 |
+| `data/processed/typhoon/track.csv` | 台風の経路（`data/typhoon/typhoon_track.csv` から変換） | 必須 |
 | `data/processed/station.csv` | 地点の緯度経度（無ければ内蔵値） | 任意 |
 | `data/processed/weather/{台風番号}_{地点}.csv` | 気象データのキャッシュ | 無ければオンデマンド取得 |
 
-- 開発用に手元の生データから仮の `data/processed/` を作る: `uv run python scripts/dev_sample_data.py`（暫定）
+- `data/processed/` を生データから生成する: `uv run python scripts/dev_sample_data.py`（台風データはこれが正式ルート。気象キャッシュは `fetch_weather` 完成までの暫定）
 - 発表前にキャッシュを一括生成する: `uv run python scripts/build_cache.py 202508 202512 202515`
   （データ側の `preprocess/weather_source.py` の `fetch_weather(station, start, end)` が必要）
 

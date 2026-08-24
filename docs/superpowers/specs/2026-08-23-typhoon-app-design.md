@@ -31,7 +31,7 @@
 | 気象項目 | 気温・降水量・風速・現地気圧 の 4 項目（気象データ契約は station, datetime, temperature, precipitation, wind_speed, pressure の 6 列）。追加項目は `config.py` の要素定義に足せば増やせる |
 | データ取得 | ハイブリッド: `data/processed/` のキャッシュ CSV を読む。無ければデータ側の `fetch_weather` をオンデマンドで呼び、結果を保存 |
 | 取得窓 | 台風データの期間（最初〜最後の時刻）の前後 1 日を固定窓で取得・表示。UI の期間スライダーは廃止 |
-| 台風経路 | `track.csv`（1 時間ごと程度の経路、必須の 1 本）を線と時刻ごとの位置マーカーで表示 |
+| 台風経路 | `track.csv`（必須の 1 本。現行データは台風あたり 1〜6 点のスナップショット。時別データが手に入れば同じ 6 列で差し替え可）を線と時刻ごとの位置マーカーで表示 |
 | 集計の責務 | アプリ側 |
 | 環境管理 | uv（`pyproject.toml` + `uv.lock`）。Community Cloud 向けに `requirements.txt` を `uv export` で生成 |
 | デプロイ | Streamlit Community Cloud を想定。データはリポジトリ同梱 |
@@ -115,7 +115,7 @@ def fetch_weather(station: str, start: datetime.date, end: datetime.date) -> pd.
 ```
 data/processed/
   weather/{typhoon_id}_{station}.csv   例: 202512_鹿児島.csv（台風データの期間 ±1 日、§4-2 の形）
-  typhoon/track.csv                    1 時間ごと程度の経路（必須）
+  typhoon/track.csv                    台風の経路（必須。点の密度は問わない）
   station.csv                          地点マスタ（任意。無ければアプリ内蔵の 8 地点座標）
 ```
 
@@ -132,7 +132,7 @@ data/processed/
 | `pressure` | float | 中心気圧 hPa |
 | `max_wind_kt` | float | 最大風速 kt |
 
-- `track.csv` は現行 `data/typhoon/typhoon_track.csv`（実体 xlsx、1991〜2025 年・258 行）をこの形に変換した、1 時間ごと程度の経路データ 1 本（必須）。最接近時刻の特定は行わない。
+- `track.csv` は現行 `data/typhoon/typhoon_track.csv`（実体 xlsx、1991〜2025 年・258 行）を `scripts/dev_sample_data.py` でこの形に変換した経路データ 1 本（必須・正式採用 2026-08-24）。台風あたり 1〜6 点のスナップショットで点の密度は問わない（時別データが手に入れば同じ 6 列で差し替えるだけでよい）。最接近時刻の特定は行わない。
 
 ### 4-5. 地点マスタ `station.csv`
 
@@ -240,7 +240,7 @@ sidebar → Selection
 ## 10. データ担当への依頼事項（まとめ）
 
 1. `fetch_weather(station, start, end)` を §4-1/§4-2 の仕様（6 列）で実装（モジュール名・場所を教えてもらう）。
-2. 現行 `data/typhoon/typhoon_track.csv`（xlsx）を §4-4 の形の `data/processed/typhoon/track.csv`（6 列・時別、1 時間ごと程度、必須）に変換。
+2. 台風データは現行 `data/typhoon/typhoon_track.csv` の変換（`scripts/dev_sample_data.py`）で正式に賄う（対応済み）。より細かい時別データが手に入れば、同じ 6 列で `track.csv` を差し替えるだけでよい。
 3. 可能なら `data/processed/station.csv`（緯度経度）を用意。
 4. データ側依存（beautifulsoup4, openpyxl 等）を `pyproject.toml` に追加。
 
