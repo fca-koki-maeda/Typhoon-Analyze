@@ -41,7 +41,7 @@ def test_parse_day_without_table_raises():
 
 def test_fetch_weather_unknown_station_raises():
     with pytest.raises(WeatherFetchError, match="未対応"):
-        fetch_weather("東京", date(2025, 7, 27), date(2025, 7, 27))
+        fetch_weather("存在しない地点", date(2025, 7, 27), date(2025, 7, 27))
 
 
 def test_fetch_weather_offline_via_monkeypatched_get(monkeypatch):
