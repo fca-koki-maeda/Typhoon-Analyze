@@ -91,7 +91,7 @@ def fetch_weather(station: str, start: datetime.date, end: datetime.date) -> pd.
     失敗時は WeatherFetchError を送出する。"""
 ```
 
-- 日付の決定はアプリ側が行う（台風データから接近基準時刻を引き、前後 7 日を計算）。データ側は「地点＋期間」だけ扱えばよい。
+- 日付の決定はアプリ側が行う（台風データの期間から前後 1 日を計算）。データ側は「地点＋期間」だけ扱えばよい。
 - 置き場所はデータ側の任意（例: `preprocess/weather_source.py`）。アプリは `typhoon_app/data/source.py` からのみ import する。
 - 気象庁サイトへの連続アクセスの間隔制御は関数の内部（データ側）の責務。
 
@@ -143,7 +143,7 @@ data/processed/
 ```
 app.py                      # 入口。ページ設定→サイドバー→データ取得→タブ描画を呼ぶだけ（ロジック無し）
 typhoon_app/
-  config.py                 # 定数: 地点 8 つ＋既定座標、要素定義（列名/表示名/単位/色）、天気コード表、MAX_WINDOW_DAYS=7、パス
+  config.py                 # 定数: 地点 8 つ＋既定座標、要素定義（列名/表示名/単位/色）、WINDOW_DAYS=1、パス
   data/
     schema.py               # カラム定義と検証 validate_weather(df) / validate_typhoon(df)
     typhoon.py              # track.csv 読込、台風一覧、台風期間と取得窓の算出
@@ -155,10 +155,10 @@ typhoon_app/
     timeseries.py           # 期間での絞り込み、要素ごとの整形（long→wide）
   charts/
     timeseries.py           # 要素別ライン/棒グラフ → plotly Figure
-    map.py                  # 地点マーカー＋台風経路（線/点）＋時刻スライダー → plotly Figure
+    map.py                  # 地点マーカー＋台風経路（線＋位置マーカー）＋時刻スライダー → plotly Figure
     ranking.py              # ランキング棒グラフ → plotly Figure
   ui/
-    state.py                # Selection dataclass（typhoon_id, stations, window_days, variables）、データ状態 enum
+    state.py                # Selection dataclass（typhoon_id, stations, variables）、データ状態 enum
     sidebar.py              # サイドバー描画 → Selection を返す
     header.py / tab_overview.py / tab_timeseries.py / tab_map.py / glossary.py
 scripts/
@@ -177,9 +177,9 @@ tests/
 
 ```
 sidebar → Selection
-  → data.typhoon.get_event(typhoon_id)            # 接近基準時刻・取得窓（±7 日）・経路（線/点）
+  → data.typhoon.get_event(typhoon_id)            # 台風期間・取得窓（±1 日固定）・経路（線＋位置マーカー）
   → data.weather.get_weather(typhoon_id, stations)  # 地点ごと: cache hit → 読む / miss → fetch → 保存
-  → analysis.timeseries.clip(df, ±window_days)
+  → analysis.timeseries.clip(df, *event.display_window())  # 表示窓は ±1 日固定
   → analysis.summary.summarize(df)                # 概要タブ用
   → charts.*(…) → ui.tab_*.render(...)
 ```
