@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-from typhoon_app.config import DEFAULT_VARIABLES, DEFAULT_WINDOW_DAYS, MAX_WINDOW_DAYS, VARIABLES
+from typhoon_app.config import DEFAULT_VARIABLES, VARIABLES
 from typhoon_app.data.typhoon import TyphoonEvent
 from typhoon_app.data.weather import StationResult
 from typhoon_app.ui.loaders import load_station_weather_cached
@@ -25,16 +25,13 @@ def render_sidebar(events: list[TyphoonEvent], station_names: list[str]) -> Sele
             "台風を選択", options=[e.typhoon_id for e in events], format_func=lambda i: labels[i]
         )
         stations = st.multiselect("地点を選択", options=station_names, default=station_names)
-        window_days = st.slider(
-            "表示期間（接近日の前後 N 日）", min_value=1, max_value=MAX_WINDOW_DAYS, value=DEFAULT_WINDOW_DAYS
-        )
         variables = st.multiselect(
             "気象要素",
             options=list(VARIABLES),
             default=list(DEFAULT_VARIABLES),
             format_func=lambda k: VARIABLES[k].label,
         )
-    return Selection(typhoon_id, tuple(stations), window_days, tuple(variables))
+    return Selection(typhoon_id, tuple(stations), tuple(variables))
 
 
 def render_data_status(results: dict[str, StationResult], fetcher_available: bool) -> None:

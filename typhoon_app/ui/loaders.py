@@ -7,13 +7,8 @@ import streamlit as st
 
 from typhoon_app.data.source import WeatherFetcher
 from typhoon_app.data.station import load_stations
-from typhoon_app.data.typhoon import load_landfall, load_track
+from typhoon_app.data.typhoon import load_track
 from typhoon_app.data.weather import StationResult, get_station_weather
-
-
-@st.cache_data(show_spinner=False)
-def load_landfall_cached():
-    return load_landfall()
 
 
 @st.cache_data(show_spinner=False)

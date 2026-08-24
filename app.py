@@ -8,13 +8,11 @@ from typhoon_app.analysis.summary import summarize
 from typhoon_app.analysis.timeseries import clip
 from typhoon_app.data.schema import SchemaError
 from typhoon_app.data.source import get_fetcher
-from typhoon_app.data.station import nearest_station
 from typhoon_app.data.typhoon import get_event, list_typhoons
 from typhoon_app.data.weather import StationResult, cache_path, combine
 from typhoon_app.ui.glossary import render_glossary
 from typhoon_app.ui.header import render_header
 from typhoon_app.ui.loaders import (
-    load_landfall_cached,
     load_station_weather_cached,
     load_stations_cached,
     load_track_cached,
@@ -30,20 +28,19 @@ def main() -> None:
 
     # 必須データ（無い／形式が違うときはメッセージを出して停止: 設計書 §7）
     try:
-        landfall = load_landfall_cached()
         track = load_track_cached()
         stations = load_stations_cached()
     except FileNotFoundError as e:
-        st.error(f"台風データがありません。data/processed/typhoon/landfall.csv を置いてください。\n\n{e}")
+        st.error(f"台風データがありません。data/processed/typhoon/track.csv を置いてください。\n\n{e}")
         st.stop()
     except SchemaError as e:
         st.error(f"データの形式が設計書 §4 と違います（データ担当に共有してください）。\n\n{e}")
         st.stop()
-    events = list_typhoons(landfall, track)
+    events = list_typhoons(track)
 
     # 条件選択
     selection = render_sidebar(events, list(stations))
-    event = get_event(selection.typhoon_id, landfall, track)
+    event = get_event(selection.typhoon_id, track)
 
     # 気象データ（キャッシュ → 無ければオンデマンド取得）
     fetcher = get_fetcher()
@@ -64,14 +61,13 @@ def main() -> None:
             st.warning("この台風のデータを取得できませんでした。サイドバーの「データ状態」を確認してください。")
 
     # ヘッダ
-    nearest = nearest_station(event.landfall_lat, event.landfall_lon, stations)
-    render_header(event, nearest.name)
+    render_header(event)
 
     if not selection.stations:
         st.info("サイドバーで地点を 1 つ以上選んでください。")
         st.stop()
 
-    window = event.display_window(selection.window_days)
+    window = event.display_window()
     df = clip(combine(results), *window)
     summary = summarize(df)
 
@@ -79,7 +75,7 @@ def main() -> None:
     with tab_overview:
         render_overview(summary, selection.variables)
     with tab_timeseries:
-        render_timeseries(df, selection.variables, event.reference_times, list(selection.stations))
+        render_timeseries(df, selection.variables, event.period, list(selection.stations))
     with tab_map:
         render_map(df, {n: stations[n] for n in selection.stations if n in stations}, event, selection.variables, window)
 

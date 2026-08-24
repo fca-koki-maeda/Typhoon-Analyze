@@ -40,8 +40,6 @@ def render_map(
     var = VARIABLES[var_key] if var_key else None
 
     fig = station_map(
-        stations, values, var, event.landfalls, event.track, typhoon_position(event, t), title=f"{_fmt(t)} の状況"
+        stations, values, var, event.track, typhoon_position(event, t), title=f"{_fmt(t)} の状況"
     )
     st.plotly_chart(fig, width="stretch")
-    if event.track is None:
-        st.caption("全経路データが無いため、台風は上陸/接近地点のみ表示しています。")
